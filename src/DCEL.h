@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <cmath>
 
 // Declarar todas las clases por que se usan mutuamente.
 class Vertex;
@@ -14,9 +15,11 @@ class Vertex {
   public:
     Vertex( float, float );
 
+    Vertex(){}; //Agregé un constructor vacío 
+
     void finish_build( Hedge );
 
-    float dist();
+    float norm();
 
     Vertex operator+( const Vertex& );
     Vertex operator-( const Vertex& );
@@ -25,8 +28,10 @@ class Vertex {
     bool operator>( const Vertex& );
     bool operator==( const Vertex& );
 
+    float  x, y; //puse a las coordenadas publicas para poderlas usar en otros lados
+
   protected:
-    float  x, y;
+    //float  x, y;
     Hedge* incident_edge;
 };
 
@@ -34,12 +39,17 @@ class DirLine {
   public:
     DirLine( Vertex, Vertex );
 
-  protected:
-    Vertex *origin, *dest;
-    // Ecuación de la recta que pasa por origin y dest, en la forma Ax + By + C = 0.
+    bool IsLeft(Vertex * );
+
+
+    // Ecuación de la recta que pasa por origin y dest, en la forma Ax + By = C.
     // Consideramos está recta con orientación de origin a dest.
     // Esto permite expresar todas las rectas incluyendo verticales.
     float A, B, C;
+
+  protected:
+    Vertex *origin, *dest;
+    
 
   private:
     void calc_equation();
@@ -50,10 +60,13 @@ class Hedge: public DirLine {
     Hedge( Vertex, Vertex );
     void finish_build( Hedge _twin, Face _incident_face, Hedge _next, Hedge _prev );
 
-  protected:
+    Vertex *origin;
     Hedge* twin;
+  protected:
+    
     Face*  incident_face;
     Hedge *next, *prev;
+    
 };
 
 class Face {
