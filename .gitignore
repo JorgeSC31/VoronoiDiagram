@@ -3,5 +3,5 @@
 **/obj/
 
 # Makefiles
-Makefile
-*.make
+# Makefile
+# *.make
