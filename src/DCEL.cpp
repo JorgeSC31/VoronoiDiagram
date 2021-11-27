@@ -19,13 +19,11 @@ float Vertex::norm(){
 }
 
 Vertex Vertex::operator+( const Vertex& _ot ) {
-    // FIXME
     Vertex res(x + _ot.x, y + _ot.y);
     return res;
 
 }
 Vertex Vertex::operator-( const Vertex& _ot ) {
-    // FIXME
     Vertex res(x - _ot.x, y - _ot.y);
     return res;
 }
@@ -37,7 +35,6 @@ bool Vertex::operator>( const Vertex& _ot ) {
     // FIXME
 }
 bool Vertex::operator==( const Vertex& _ot ) {
-    // FIXME
     // o tal vez aquí podemos poner que si ||self-ot|| < tol entonces son iguales
     double tol = 0.000000001;
     if( (*this - _ot).norm() < tol )
@@ -66,7 +63,7 @@ void DirLine::calc_equation() {
 
 bool DirLine::IsLeft(Vertex *v){
     //Dice si el vertice v esta a la izquierda del segmento dirigido
-    if(determinant(*dest - *origin, *v - *origin)  > 0)
+    if ( determinant(*dest - *origin, *v - *origin)  > 0 )
         return true;
     else
         return false;
@@ -104,12 +101,32 @@ void Face::finish_build( Hedge _outer_component ) {
 // DCEL definitions //
 //////////////////////
 
-void DCEL::export_txt( std::string file_name ) {
-    // FIXME
+void DCEL::update_txt( std::ofstream &file){
     // Solo necesitas pasar vertices y aristas.
     // El centro de las caras es un punto de voronoi,
     // hay que hacer distinción de este punto para ponerlo de
     // otro color en el plot.
+
+    //Nota: Esta función sólo imprime la información de la DCEL. En cada iteración se debe
+    // imprimir primero el número de iteración i seguido de los primeros i puntos del INPUT, luego
+    // se llama esta función para imprimir la DCEL
+
+    int num_vertices = vertices.size();
+    file << num_vertices << "\n";
+    for(int j = 0; j < num_vertices; j++){
+        Vertex v = vertices[j];
+        file << v.x << " " << v.y << "\n";
+    }
+
+    int num_hedges = hedges.size();
+    file << num_hedges << "\n";
+    for(int j = 0; j < num_hedges; j++){
+        Hedge arista = hedges[j];
+
+        Vertex v1 = *(arista.origin);
+        Vertex v2 = *(arista.twin->origin);
+        file << v1.x << " " << v1.y << " "  << v2.x  << " " << v2.y << "\n";
+    }
 }
 
 ///////////////////////
@@ -124,7 +141,7 @@ DirLine bisector( Vertex v1, Vertex v2 ) {
     // y que pase por su punto medio.
 
 
-    //El único error que habría es si v1 = v2
+    //Para que esto jale bien v1 != v2
     Vertex p1((v1.x + v2.x)/2, (v1.y + v2.y)/2);
     Vertex r = v2 - v1;
     Vertex ortogonal(-r.y, r.x);
@@ -164,7 +181,7 @@ Vertex line_intersection( Hedge arista, DirLine bisec ) {
 
     float det = bisec.A*line.B - line.A*bisec.B;
 
-    float x = (line.B*bisec.C- bisec.B*line.C)/det;
+    float x = (line.B*bisec.C - bisec.B*line.C)/det;
     float y = (bisec.A*line.C - line.A*bisec.C)/det;
     return Vertex(x, y);
 

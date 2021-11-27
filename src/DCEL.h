@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <fstream>
 
 // Declarar todas las clases por que se usan mutuamente.
 class Vertex;
@@ -39,7 +40,7 @@ class DirLine {
   public:
     DirLine( Vertex, Vertex );
 
-    bool IsLeft(Vertex * );
+    bool IsLeft(Vertex* );
 
 
     // Ecuación de la recta que pasa por origin y dest, en la forma Ax + By = C.
@@ -85,7 +86,7 @@ class DCEL {
   public:
     DCEL();
 
-    void export_txt( std::string file_name );
+    void update_txt( std::ofstream &file);
 
   protected:
     std::vector< Vertex > vertices;
