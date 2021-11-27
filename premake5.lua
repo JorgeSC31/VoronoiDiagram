@@ -10,8 +10,8 @@ project "Voronoi"
     objdir "%{wks.location}/obj/%{cfg.buildcfg}"
 
     files {
-        "*.cpp",
-        "*.h"
+        "src/**.cpp",
+        "src/**.h"
     }
     
     filter "configurations:Debug"
