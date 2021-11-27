@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 // Declarar todas las clases por que se usan mutuamente.
 class Vertex;
@@ -14,6 +15,15 @@ class Vertex {
     Vertex( float, float );
 
     void finish_build( Hedge );
+
+    float dist();
+
+    Vertex operator+( const Vertex& );
+    Vertex operator-( const Vertex& );
+
+    bool operator<( const Vertex& );
+    bool operator>( const Vertex& );
+    bool operator==( const Vertex& );
 
   protected:
     float  x, y;
