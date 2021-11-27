@@ -63,7 +63,9 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/DCEL.o
 GENERATED += $(OBJDIR)/voronoi.o
+OBJECTS += $(OBJDIR)/DCEL.o
 OBJECTS += $(OBJDIR)/voronoi.o
 
 # Rules
@@ -128,6 +130,9 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/DCEL.o: src/DCEL.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/voronoi.o: src/voronoi.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"

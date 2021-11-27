@@ -1,7 +1,8 @@
 #include <iostream>
-using namespace std;
+
+#include "DCEL.h"
 
 int main() {
-    cout << "Hello World!" << '\n';
+    std::cout << "Hello World!" << '\n';
     return 0;
 }
