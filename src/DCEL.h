@@ -13,6 +13,8 @@ class Vertex {
   public:
     Vertex( float, float );
 
+    void finish_build( Hedge );
+
   protected:
     float  x, y;
     Hedge* incident_edge;
@@ -28,21 +30,27 @@ class DirLine {
     // Consideramos está recta con orientación de origin a dest.
     // Esto permite expresar todas las rectas incluyendo verticales.
     float A, B, C;
+
+  private:
+    void calc_equation();
 };
 
-class Hedge: DirLine {
+class Hedge: public DirLine {
   public:
     Hedge( Vertex, Vertex );
+    void finish_build( Hedge _twin, Face _incident_face, Hedge _next, Hedge _prev );
 
   protected:
-    Hedge*  twin;
-    Face*   incident_face;
-    Vertex *next, *prev;
+    Hedge* twin;
+    Face*  incident_face;
+    Hedge *next, *prev;
 };
 
 class Face {
   public:
     Face( Vertex );
+
+    void finish_build( Hedge _outer_component );
 
   protected:
     Vertex* center;
@@ -53,6 +61,8 @@ class Face {
 class DCEL {
   public:
     DCEL();
+
+    void export_txt( std::string file_name );
 
   protected:
     std::vector< Vertex > vertices;
