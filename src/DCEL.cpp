@@ -94,7 +94,7 @@ void Hedge::finish_build( Hedge _twin, Face _incident_face, Hedge _next, Hedge _
 
 ///////////////////////
 // Face definitions //
-//////////////////////
+///////////////////////
 
 Face::Face( Vertex _center ) {
     center          = &_center;

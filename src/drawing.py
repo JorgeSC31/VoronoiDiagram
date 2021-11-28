@@ -46,3 +46,5 @@ class Voronoi(Scene):
             file.readline() #skip
             self.wait(1) #Wait 1 second
             self.clear() #Erase
+
+        file.close()

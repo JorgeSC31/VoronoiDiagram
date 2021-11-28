@@ -9,5 +9,9 @@ int main() {
     std::ofstream out_file("voronoi_diagram.txt");
     out_file<< N <<"\n";
 
+
+
+
+    out_file.close();
     return 0;
 }
