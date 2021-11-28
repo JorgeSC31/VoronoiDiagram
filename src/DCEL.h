@@ -41,6 +41,7 @@ class DirLine {
     DirLine( Vertex, Vertex );
 
     bool IsLeft(Vertex* );
+    bool IsRight(Vertex* );
 
 
     // Ecuación de la recta que pasa por origin y dest, en la forma Ax + By = C.

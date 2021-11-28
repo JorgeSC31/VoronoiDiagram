@@ -69,6 +69,14 @@ bool DirLine::IsLeft(Vertex *v){
         return false;
 }
 
+bool DirLine::IsRight(Vertex *v){
+    //Dice si el vertice v esta a la izquierda del segmento dirigido
+    if ( determinant(*dest - *origin, *v - *origin)  < 0 )
+        return true;
+    else
+        return false;
+}
+
 
 
 ///////////////////////
@@ -163,6 +171,16 @@ bool is_intersection( Hedge arista, DirLine bisec ) {
 
     Vertex *v1 = arista.origin;
     Vertex *v2 = arista.twin->origin;
+
+    //Checar el caso en el que origin esta sobre la recta
+    if(bisec.IsLeft(v1) == false && bisec.IsRight(v1) == false)
+    {
+        //caso en el que el arista esta completamente sobre la recta
+        if(bisec.IsLeft(v2) == false && bisec.IsRight(v2) == false) 
+            return true;
+        else
+            return false;
+    }
 
     if(bisec.IsLeft(v1) != bisec.IsLeft(v2)) 
         return true;
