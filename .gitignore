@@ -5,3 +5,7 @@
 # Makefiles
 # Makefile
 # *.make
+
+.vscode/
+!.vscode/launch.json
+!.vscode/task.json
