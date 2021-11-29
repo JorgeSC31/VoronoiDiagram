@@ -73,6 +73,8 @@ class Face {
 
     void finish_build( Hedge* _outer_component );
 
+    Vertex get_center();
+
   protected:
     Vertex center;
     Hedge* outer_component;
@@ -100,3 +102,5 @@ float   determinant( Vertex a, Vertex b );
 bool    is_intersection( Hedge arista, DirLine bisec );
 
 Vertex line_intersection( Hedge arista, DirLine bisec );
+
+float dist( Vertex, Vertex );

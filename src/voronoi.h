@@ -4,11 +4,18 @@
 
 class voronoi {
   public:
-    voronoi( std::vector< std::pair< float, float > > _pts );
-    voronoi( std::string file_name );
+    voronoi( std::vector< std::pair< float, float > > _pts, float );
+    voronoi( std::string file_name, float );
 
   protected:
+    float                 margin;
     std::vector< Vertex > pts;
 
+    std::vector< Face* > faces;
+
     void incremental_voronoi();
+    void insert_first_point();
+    void add_voronoi( Vertex );
+
+    Face* find_face( Vertex );
 };

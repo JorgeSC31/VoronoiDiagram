@@ -105,6 +105,10 @@ void Face::finish_build( Hedge* _outer_component ) {
     outer_component = _outer_component;
 }
 
+Vertex Face::get_center() {
+    return center;
+}
+
 //////////////////////
 // DCEL definitions //
 //////////////////////
@@ -198,4 +202,9 @@ Vertex line_intersection( Hedge arista, DirLine bisec ) {
     float x = ( line.B * bisec.C - bisec.B * line.C ) / det;
     float y = ( bisec.A * line.C - line.A * bisec.C ) / det;
     return Vertex( x, y );
+}
+
+float dist( Vertex v1, Vertex v2 ) {
+    Vertex v = v1 - v2;
+    return v.norm();
 }
