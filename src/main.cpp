@@ -7,7 +7,7 @@ int main() {
 
     // out_file.close();
 
-    voronoi V( "res/case1.txt" );
+    voronoi V( "res/case1" );
 
     return 0;
 }

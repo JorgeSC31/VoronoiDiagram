@@ -220,6 +220,9 @@ bool is_intersection( Hedge arista, DirLine bisec ) {
             return false;
     }
 
+    if ( bisec.IsLeft( v2 ) == false && bisec.IsRight( v2 ) == false )
+        return true;
+
     if ( bisec.IsLeft( v1 ) != bisec.IsLeft( v2 ) )
         return true;
     else

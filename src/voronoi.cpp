@@ -11,27 +11,53 @@ voronoi::voronoi( std::vector< std::pair< float, float > > _pts, float _margin )
     incremental_voronoi();
 }
 
-voronoi::voronoi( std::string file_name, float _margin ) {
+voronoi::voronoi( std::string file_name, float _margin ):
+    margin( _margin ), out_file( std::ofstream( file_name + ".out" ) ) {
     // FIXME
     // Debe leer el número de puntos N
     // Después N lineas con 2 float cada uno
     // hay que ponerlos en el vector<Vertex> pts
     margin = _margin;
 
+    std::string input_file_name = file_name + ".in";
+
     int           N;
     float         x, y;
-    std::ifstream file( file_name );
+    std::ifstream in_file( input_file_name );
 
-    file >> N;
+    in_file >> N;
 
     for ( int j = 0; j < N; j++ ) {
-        file >> x >> y;
+        in_file >> x >> y;
         Vertex v( x, y );
         pts.push_back( v );
     }
-    file.close();
+    in_file.close();
 
+    // abrir file de output
+    out_file << N << '\n';
     incremental_voronoi();
+    out_file.close();
+}
+
+void voronoi::update_txt() {
+    for ( auto f: faces ) {
+        Vertex v = f->get_center();
+        out_file << v.x << ' ' << v.y << '\n';
+    }
+    for ( auto f: faces ) {
+        Hedge* inicio = f->get_outer_component();
+        Hedge* edge   = inicio;
+
+        do {
+            Vertex v1 = edge->origin;
+            Vertex v2 = edge->dest;
+            out_file << v1.x << ' ' << v1.y << ' ' << v2.x << ' ' << v2.y << '\n';
+
+            edge = edge->next;
+        } while ( edge != inicio );
+    }
+    out_file << "1000 1000 1000 1000\n";
 }
 
 std::pair< Hedge*, Hedge* > voronoi::get_face_intersection( const Face* div_face,
@@ -71,6 +97,7 @@ Face* voronoi::find_face( Vertex v ) {
 }
 
 Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine bisec ) {
+    // Puede suceder el caso que v_inter2 sea igual a inter2->dest
     Vertex v_inter1 = line_intersection( inter1, bisec );
     Vertex v_inter2 = line_intersection( inter2, bisec );
 
@@ -87,16 +114,22 @@ Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine 
     incident_div->prev = prev;
 
     // set next
-    next->prev         = incident_div;
-    incident_div->next = next;
-    next->next         = inter2->next;
-    next->next->prev   = next;
+    if ( v_inter2 == inter2->dest ) {
+        incident_div->next       = inter2->next;
+        incident_div->next->prev = incident_div;
+    } else {
+        next->prev         = incident_div;
+        incident_div->next = next;
+        next->next         = inter2->next;
+        next->next->prev   = next;
+    }
 
     incident_div->twin = twin;
     twin->twin         = incident_div;
 
     inter2->next = nullptr;
 
+    div_face->finish_build( incident_div );
     return twin;
 }
 
@@ -152,8 +185,13 @@ void voronoi::add_voronoi( Vertex v ) {
         Vertex prev_inter    = line_intersection( edge_frontier, bisec );
 
         while ( edge_frontier->twin == nullptr && edge_frontier != aristas.second ) {
+            if ( prev_inter == edge_frontier->dest ) {
+                edge_frontier = edge_frontier->next;
+                continue;
+            }
             Hedge* v_hedge = new Hedge( prev_inter, edge_frontier->dest );
             v_face->push( v_hedge );
+            prev_inter    = edge_frontier->dest;
             edge_frontier = edge_frontier->next;
         }
 
@@ -215,10 +253,9 @@ void voronoi::insert_first_point() {
 
 void voronoi::incremental_voronoi() {
     insert_first_point();
-    // update_txt( std::ofstream& file );
-
+    update_txt();
     for ( int i = 1; i < pts.size(); i++ ) {
         add_voronoi( pts[i] );
-        // update_txt( std::ofstream& file );
+        update_txt();
     }
 }
