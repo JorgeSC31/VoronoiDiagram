@@ -25,8 +25,8 @@ class Vertex {
     Vertex operator+( const Vertex& ) const;
     Vertex operator-( const Vertex& ) const;
 
-    bool operator<( const Vertex& ) const;
-    bool operator>( const Vertex& ) const;
+    // bool operator<( const Vertex& ) const;
+    // bool operator>( const Vertex& ) const;
     bool operator==( const Vertex& ) const;
 
     float x, y; // puse a las coordenadas publicas para poderlas usar en otros lados
@@ -76,10 +76,11 @@ class Face {
     void finish_build( Hedge* _outer_component );
 
     Vertex get_center();
+    Hedge* get_outer_component() const;
 
   protected:
-    Vertex center;
     Hedge* outer_component;
+    Vertex center;
     // inner_component no es necesario.
 };
 

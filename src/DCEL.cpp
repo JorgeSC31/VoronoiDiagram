@@ -27,12 +27,12 @@ Vertex Vertex::operator-( const Vertex& _ot ) const {
     return res;
 }
 
-bool Vertex::operator<( const Vertex& _ot ) const {
-    // FIXME
-}
-bool Vertex::operator>( const Vertex& _ot ) const {
-    // FIXME
-}
+// bool Vertex::operator<( const Vertex& _ot ) const {
+//     // FIXME
+// }
+// bool Vertex::operator>( const Vertex& _ot ) const {
+//     // FIXME
+// }
 bool Vertex::operator==( const Vertex& _ot ) const {
     // o tal vez aquí podemos poner que si ||self-ot|| < tol entonces son iguales
     double tol = 0.000000001;
@@ -142,6 +142,9 @@ void Face::close( bool add_hedge = false ) {
 
 Vertex Face::get_center() {
     return center;
+}
+Hedge* Face::get_outer_component() const {
+    return outer_component;
 }
 
 //////////////////////

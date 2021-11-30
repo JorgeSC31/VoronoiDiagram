@@ -2,7 +2,7 @@
 
 #include "voronoi.h"
 
-voronoi::voronoi( std::vector< std::pair< float, float > > _pts, float _margin = 1.0 ) {
+voronoi::voronoi( std::vector< std::pair< float, float > > _pts, float _margin ) {
     // FIXME
     // No es escencial este constructor.
     // Solo debe pasar los _pts a Vertex.
@@ -11,7 +11,7 @@ voronoi::voronoi( std::vector< std::pair< float, float > > _pts, float _margin =
     incremental_voronoi();
 }
 
-voronoi::voronoi( std::string file_name, float _margin = 1.0 ) {
+voronoi::voronoi( std::string file_name, float _margin ) {
     // FIXME
     // Debe leer el número de puntos N
     // Después N lineas con 2 float cada uno
@@ -34,6 +34,28 @@ voronoi::voronoi( std::string file_name, float _margin = 1.0 ) {
     incremental_voronoi();
 }
 
+std::pair< Hedge*, Hedge* > voronoi::get_face_intersection( const Face* div_face,
+                                                            DirLine     bisec ) {
+
+    Hedge *h1 = nullptr, *h2 = nullptr;
+    Hedge* edge       = div_face->get_outer_component();
+    Hedge* first_edge = edge;
+
+    do {
+        if ( is_intersection( *edge, bisec ) ) {
+            if ( bisec.IsRight( edge->origin ) )
+                h1 = edge;
+            else
+                h2 = edge;
+        }
+        edge = edge->next;
+    } while ( edge != first_edge );
+
+    if ( h1 == nullptr )
+        h2 = nullptr;
+    return std::make_pair( h1, h2 );
+}
+
 Face* voronoi::find_face( Vertex v ) {
     Face* ret      = nullptr;
     float min_dist = std::numeric_limits< float >::max();
@@ -48,7 +70,7 @@ Face* voronoi::find_face( Vertex v ) {
     return ret;
 }
 
-Hedge* cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine bisec ) {
+Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine bisec ) {
     Vertex v_inter1 = line_intersection( inter1, bisec );
     Vertex v_inter2 = line_intersection( inter2, bisec );
 
@@ -148,8 +170,8 @@ void voronoi::add_voronoi( Vertex v ) {
 void voronoi::insert_first_point() {
 
     float x_min, x_max, y_min, y_max;
-    x_min = y_min = -std::numeric_limits< float >::max();
-    x_max = y_max = std::numeric_limits< float >::max();
+    x_min = y_min = std::numeric_limits< float >::max();
+    x_max = y_max = -std::numeric_limits< float >::max();
 
     for ( auto v: pts ) {
         x_min = std::min( x_min, v.x );
@@ -187,6 +209,7 @@ void voronoi::insert_first_point() {
     h4->next = h1;
 
     Face* v_face = new Face( pts[0] );
+    faces.push_back( v_face );
     v_face->finish_build( h1 );
 }
 
