@@ -6,6 +6,8 @@
 # Makefile
 # *.make
 
+res/*.out
+
 .vscode/
 !.vscode/launch.json
 !.vscode/task.json

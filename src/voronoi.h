@@ -10,8 +10,9 @@ class voronoi {
   protected:
     float                 margin;
     std::vector< Vertex > pts;
+    std::ofstream         out_file;
 
-    void update_txt( std::ofstream& file );
+    void update_txt();
 
     std::vector< Face* > faces;
 
