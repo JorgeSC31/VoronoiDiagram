@@ -56,10 +56,9 @@ void voronoi::add_voronoi( Vertex v ) {
     Face* v_face = new Face( v );
     faces.push_back( v_face );
 
-    while ( 1 ) {
-        // FIXME
-        // Hay que corregir la condición de paro.
+    bool add_hedge = false;
 
+    do {
         /*
             Cada cara donde v tenga región va a cortar en
             1 arista: En este caso saltamos a la siguiente cara.
@@ -77,21 +76,15 @@ void voronoi::add_voronoi( Vertex v ) {
               |_______|______>>>_|arista.second
 
         */
-        if ( aristas.second == nullptr ) {
-            // FIXME
-            // Debemos de actualizar div_face para que no se cicle.
-
-            // continue;
-            break;
+        if ( aristas.second != nullptr ) {
+            // Regresa el twin de la arista creada, ie. el Hedge nuevo para la región de v.
+            // Además corta el poligono y pone arista.second->next = nullptr.
+            // No elimina la cadena de aristas, ya que se va a ocupar después.
+            // Las Hedges de caras adyacentes quedan inmutables.
+            Hedge* v_hedge         = cut_face( div_face, aristas.first, aristas.second );
+            v_hedge->incident_face = v_face;
+            v_face->push( v_hedge );
         }
-
-        // Regresa el twin de la arista creada, ie. el Hedge nuevo para la región de v.
-        // Además corta el poligono y pone arista.second->next = nullptr.
-        // No elimina la cadena de aristas, ya que se va a ocupar después.
-        // Las Hedges de caras adyacentes quedan inmutables.
-        Hedge* v_hedge         = cut_face( div_face, aristas.first, aristas.second );
-        v_hedge->incident_face = v_face;
-        v_face->push( v_hedge );
 
         // Hay que movernos a la siguiente cara.
         // Si estamos en la frontera la siguiente cara es nullptr, esto es un caso especial.
@@ -106,14 +99,20 @@ void voronoi::add_voronoi( Vertex v ) {
         Hedge* edge_frontier = aristas.first;
         Vertex prev_inter    = line_intersection( edge_frontier, bisec );
 
-        while ( edge_frontier->twin == nullptr ) {
+        while ( edge_frontier->twin == nullptr && edge_frontier != aristas.second ) {
             Hedge* v_hedge = new Hedge( prev_inter, edge_frontier->dest );
             v_face->push( v_hedge );
             edge_frontier = edge_frontier->next;
         }
 
+        if ( edge_frontier == aristas.second ) {
+            add_hedge = true;
+            break;
+        }
         div_face = edge_frontier->twin->incident_face;
-    }
+
+    } while ( div_face != original_face );
+    v_face->close( add_hedge );
 }
 
 void voronoi::incremental_voronoi() {
