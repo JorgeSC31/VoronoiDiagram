@@ -1,5 +1,8 @@
 #include "DCEL.h"
 
+// Tolerancia a zero para punto flotante.
+const float tol = 0.000001;
+
 ////////////////////////
 // Vertex definitions //
 ////////////////////////
@@ -35,7 +38,7 @@ Vertex Vertex::operator-( const Vertex& _ot ) const {
 // }
 bool Vertex::operator==( const Vertex& _ot ) const {
     // o tal vez aquí podemos poner que si ||self-ot|| < tol entonces son iguales
-    double tol = 0.000000001;
+    // double tol = 0.000000001;
     if ( ( *this - _ot ).norm() < tol )
         return true;
     else
@@ -62,7 +65,7 @@ void DirLine::calc_equation() {
 
 bool DirLine::IsLeft( const Vertex& v ) const {
     // Dice si el vertice v esta a la izquierda del segmento dirigido
-    if ( determinant( dest - origin, v - origin ) > 0 )
+    if ( determinant( dest - origin, v - origin ) > tol )
         return true;
     else
         return false;
@@ -70,7 +73,7 @@ bool DirLine::IsLeft( const Vertex& v ) const {
 
 bool DirLine::IsRight( const Vertex& v ) const {
     // Dice si el vertice v esta a la izquierda del segmento dirigido
-    if ( determinant( dest - origin, v - origin ) < 0 )
+    if ( determinant( dest - origin, v - origin ) < tol )
         return true;
     else
         return false;

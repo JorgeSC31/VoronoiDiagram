@@ -1,10 +1,10 @@
 from manim import *
-config.frame_width = 15
+config.frame_width = 14
 
 
 class Voronoi(Scene):
     def construct(self):
-        file = open("res/case2.out", "r")
+        file = open("res/case3.out", "r")
 
         num_iterations = int(file.readline())  # Numero de puntos del INPUT
 
@@ -15,7 +15,7 @@ class Voronoi(Scene):
                 s = l.split(" ")
                 x = float(s[0])
                 y = float(s[1])
-                self.add(Dot([x, y, 0], color=PURE_RED, radius=0.15))
+                self.add(Dot([x, y, 0], color=PURE_RED, radius=0.06))
 
             l = file.readline()
             s = l.split(" ")
@@ -28,8 +28,8 @@ class Voronoi(Scene):
                 dot2 = [x2, y2, 0]
 
                 # Add vertices
-                self.add(Dot(dot1, radius=0.15))
-                self.add(Dot(dot2, radius=0.15))
+                # self.add(Dot(dot1, radius=0.05))
+                # self.add(Dot(dot2, radius=0.05))
 
                 # Add half edges
                 self.add(Line(dot1, dot2))
@@ -42,7 +42,7 @@ class Voronoi(Scene):
                 x2 = float(s[2])
                 y2 = float(s[3])
 
-            self.wait(1)  # Wait 1 second
+            self.wait(0.4)  # Wait 1 second
             self.clear()  # Erase
 
         file.close()
