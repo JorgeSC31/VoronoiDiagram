@@ -1,7 +1,8 @@
 #include "DCEL.h"
 
 // Tolerancia a zero para punto flotante.
-const float tol = 0.000001;
+// const float tol = 0.000001;
+const float tol = 0;
 
 ////////////////////////
 // Vertex definitions //
