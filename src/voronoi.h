@@ -24,4 +24,5 @@ class voronoi {
 
     Face*  find_face( Vertex );
     Hedge* cut_face( Face*, Hedge*, Hedge*, DirLine bisec );
+    void   fix_twins( Face* );
 };

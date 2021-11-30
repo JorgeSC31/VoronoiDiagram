@@ -57,7 +57,7 @@ void voronoi::update_txt() {
             edge = edge->next;
         } while ( edge != inicio );
     }
-    out_file << "1000 1000 1000 1000\n";
+    out_file << "10000 10000 10000 10000\n";
 }
 
 std::pair< Hedge*, Hedge* > voronoi::get_face_intersection( const Face* div_face,
@@ -108,21 +108,24 @@ Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine 
     Hedge* next = new Hedge( v_inter2, inter2->dest );
 
     // set prev
-    prev->prev         = inter1->prev;
-    prev->prev->next   = prev;
-    prev->next         = incident_div;
-    incident_div->prev = prev;
+    prev->prev          = inter1->prev;
+    prev->prev->next    = prev;
+    prev->next          = incident_div;
+    incident_div->prev  = prev;
+    prev->incident_face = div_face;
 
     // set next
     if ( v_inter2 == inter2->dest ) {
         incident_div->next       = inter2->next;
         incident_div->next->prev = incident_div;
     } else {
-        next->prev         = incident_div;
-        incident_div->next = next;
-        next->next         = inter2->next;
-        next->next->prev   = next;
+        next->prev          = incident_div;
+        incident_div->next  = next;
+        next->next          = inter2->next;
+        next->next->prev    = next;
+        next->incident_face = div_face;
     }
+    incident_div->incident_face = div_face;
 
     incident_div->twin = twin;
     twin->twin         = incident_div;
@@ -133,6 +136,23 @@ Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine 
     return twin;
 }
 
+void voronoi::fix_twins( Face* v_face ) {
+    Hedge* first_edge = v_face->get_outer_component();
+    Hedge* edge       = first_edge;
+    Hedge *adj1, *adj2;
+
+    do {
+        if ( edge->twin != nullptr && edge->prev->twin != nullptr ) {
+            adj1       = edge->twin->next;
+            adj2       = edge->prev->twin->prev;
+            adj1->twin = adj2;
+            adj2->twin = adj1;
+        }
+
+        edge = edge->next;
+    } while ( edge != first_edge );
+}
+
 void voronoi::add_voronoi( Vertex v ) {
     // Buscar en que cara esta v.
     Face* original_face = find_face( v );
@@ -141,7 +161,7 @@ void voronoi::add_voronoi( Vertex v ) {
     Face* v_face = new Face( v );
     faces.push_back( v_face );
 
-    bool add_hedge = false;
+    bool add_prev = false;
 
     do {
         /*
@@ -168,6 +188,12 @@ void voronoi::add_voronoi( Vertex v ) {
             // Las Hedges de caras adyacentes quedan inmutables.
             Hedge* v_hedge = cut_face( div_face, aristas.first, aristas.second, bisec );
             v_hedge->incident_face = v_face;
+
+            if ( add_prev ) {
+                // Agregar arista al siguiente vertice.
+                v_face->push( v_hedge->origin );
+                add_prev = false;
+            }
             v_face->push( v_hedge );
         }
 
@@ -178,31 +204,40 @@ void voronoi::add_voronoi( Vertex v ) {
             div_face = aristas.first->twin->incident_face;
             continue;
         }
-        // Si no existe, nos vamos a mover sobre la antigua frontera, que es la cadena de
-        // aristas que inicia con aristas.first.
+        // Si no existe, nos vamos a mover sobre la frontera hasta encontrar la siguiente
+        // arista que intersecta un bisector.
         // Las aristas nuevas que se creen durante este proceso tienen twin=nullptr.
         Hedge* edge_frontier = aristas.first;
         Vertex prev_inter    = line_intersection( edge_frontier, bisec );
 
-        while ( edge_frontier->twin == nullptr && edge_frontier != aristas.second ) {
+        bool flag = true;
+
+        // while ( edge_frontier->twin == nullptr && edge_frontier != aristas.second ) {
+        while ( flag ) {
+            // Si la siguiente arista es solo un punto lo ignoramos.
             if ( prev_inter == edge_frontier->dest ) {
                 edge_frontier = edge_frontier->next;
                 continue;
             }
             Hedge* v_hedge = new Hedge( prev_inter, edge_frontier->dest );
             v_face->push( v_hedge );
-            prev_inter    = edge_frontier->dest;
+            prev_inter = edge_frontier->dest;
+
             edge_frontier = edge_frontier->next;
+            if ( edge_frontier->twin != nullptr )
+                edge_frontier = edge_frontier->twin->next;
+
+            Vertex  v_frontier  = edge_frontier->incident_face->get_center();
+            DirLine bisec_front = bisector( v, v_frontier );
+            flag                = !is_intersection( *edge_frontier, bisec_front );
         }
 
-        if ( edge_frontier == aristas.second ) {
-            add_hedge = true;
-            break;
-        }
-        div_face = edge_frontier->twin->incident_face;
+        add_prev = true;
+        div_face = edge_frontier->incident_face;
 
     } while ( div_face != original_face );
-    v_face->close( add_hedge );
+    v_face->close( add_prev );
+    fix_twins( v_face );
 }
 
 void voronoi::insert_first_point() {
@@ -224,6 +259,9 @@ void voronoi::insert_first_point() {
     y_max += margin;
 
     // Construir la cara con aristas de rectangulo
+    Face* v_face = new Face( pts[0] );
+    faces.push_back( v_face );
+
     Vertex v1( x_min, y_min );
     Vertex v2( x_max, y_min );
     Vertex v3( x_max, y_max );
@@ -234,20 +272,22 @@ void voronoi::insert_first_point() {
     Hedge* h3 = new Hedge( v3, v4 );
     Hedge* h4 = new Hedge( v4, v1 );
 
-    h1->prev = h4;
-    h1->next = h2;
+    h1->prev          = h4;
+    h1->next          = h2;
+    h1->incident_face = v_face;
 
-    h2->prev = h1;
-    h2->next = h3;
+    h2->prev          = h1;
+    h2->next          = h3;
+    h2->incident_face = v_face;
 
-    h3->prev = h2;
-    h3->next = h4;
+    h3->prev          = h2;
+    h3->next          = h4;
+    h3->incident_face = v_face;
 
-    h4->prev = h3;
-    h4->next = h1;
+    h4->prev          = h3;
+    h4->next          = h1;
+    h4->incident_face = v_face;
 
-    Face* v_face = new Face( pts[0] );
-    faces.push_back( v_face );
     v_face->finish_build( h1 );
 }
 

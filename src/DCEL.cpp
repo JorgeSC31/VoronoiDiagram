@@ -106,6 +106,7 @@ void Face::finish_build( Hedge* _outer_component ) {
 }
 
 void Face::push( Hedge* next_hedge ) {
+    next_hedge->incident_face = this;
     if ( outer_component == nullptr ) {
         outer_component = next_hedge;
         return;
@@ -115,6 +116,12 @@ void Face::push( Hedge* next_hedge ) {
     next_hedge->prev      = outer_component;
     outer_component       = next_hedge;
 }
+
+void Face::push( Vertex next_vert ) {
+    Hedge* next_hedge = new Hedge( outer_component->dest, next_vert );
+    push( next_hedge );
+}
+
 void Face::pop() {
     if ( outer_component == nullptr )
         return;
@@ -131,10 +138,11 @@ void Face::close( bool add_hedge = false ) {
         first = first->prev;
 
     if ( add_hedge ) {
-        Hedge* n_hedge = new Hedge( last->dest, first->origin );
-        last->next     = n_hedge;
-        n_hedge->prev  = last;
-        last           = n_hedge;
+        Hedge* n_hedge         = new Hedge( last->dest, first->origin );
+        last->next             = n_hedge;
+        n_hedge->prev          = last;
+        last                   = n_hedge;
+        n_hedge->incident_face = this;
     }
     last->next  = first;
     first->prev = last;

@@ -70,6 +70,7 @@ class Face {
     Face( Vertex );
 
     void push( Hedge* next_hedge );
+    void push( Vertex next_vert );
     void pop();
     void close( bool add_hedge );
 
