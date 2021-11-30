@@ -71,6 +71,7 @@ Face* voronoi::find_face( Vertex v ) {
 }
 
 Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine bisec ) {
+    // Puede suceder el caso que v_inter2 sea igual a inter2->dest
     Vertex v_inter1 = line_intersection( inter1, bisec );
     Vertex v_inter2 = line_intersection( inter2, bisec );
 
@@ -87,16 +88,22 @@ Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine 
     incident_div->prev = prev;
 
     // set next
-    next->prev         = incident_div;
-    incident_div->next = next;
-    next->next         = inter2->next;
-    next->next->prev   = next;
+    if ( v_inter2 == inter2->dest ) {
+        incident_div->next       = inter2->next;
+        incident_div->next->prev = incident_div;
+    } else {
+        next->prev         = incident_div;
+        incident_div->next = next;
+        next->next         = inter2->next;
+        next->next->prev   = next;
+    }
 
     incident_div->twin = twin;
     twin->twin         = incident_div;
 
     inter2->next = nullptr;
 
+    div_face->finish_build( incident_div );
     return twin;
 }
 
@@ -152,8 +159,13 @@ void voronoi::add_voronoi( Vertex v ) {
         Vertex prev_inter    = line_intersection( edge_frontier, bisec );
 
         while ( edge_frontier->twin == nullptr && edge_frontier != aristas.second ) {
+            if ( prev_inter == edge_frontier->dest ) {
+                edge_frontier = edge_frontier->next;
+                continue;
+            }
             Hedge* v_hedge = new Hedge( prev_inter, edge_frontier->dest );
             v_face->push( v_hedge );
+            prev_inter    = edge_frontier->dest;
             edge_frontier = edge_frontier->next;
         }
 
