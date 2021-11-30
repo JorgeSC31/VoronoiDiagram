@@ -105,6 +105,24 @@ void Face::finish_build( Hedge* _outer_component ) {
     outer_component = _outer_component;
 }
 
+void Face::push( Hedge* next_hedge ) {
+    if ( outer_component == nullptr ) {
+        outer_component = next_hedge;
+        return;
+    }
+
+    outer_component->next = next_hedge;
+    next_hedge->prev      = outer_component;
+    outer_component       = next_hedge;
+}
+void Face::pop() {
+    if ( outer_component == nullptr )
+        return;
+    outer_component = outer_component->prev;
+    if ( outer_component != nullptr )
+        outer_component->next = nullptr;
+}
+
 Vertex Face::get_center() {
     return center;
 }
@@ -136,7 +154,7 @@ void DCEL::update_txt( std::ofstream& file ) {
         Hedge arista = hedges[j];
 
         Vertex v1 = arista.origin;
-        Vertex v2 = arista.twin->origin;
+        Vertex v2 = arista.dest;
         file << v1.x << " " << v1.y << " " << v2.x << " " << v2.y << "\n";
     }
 }
@@ -171,7 +189,7 @@ bool is_intersection( Hedge arista, DirLine bisec ) {
     // si hay intersección en (origin, dest] con bisec (la recta completa).
 
     Vertex v1 = arista.origin;
-    Vertex v2 = arista.twin->origin;
+    Vertex v2 = arista.dest;
 
     // Checar el caso en el que origin esta sobre la recta
     if ( bisec.IsLeft( v1 ) == false && bisec.IsRight( v1 ) == false ) {
@@ -188,12 +206,12 @@ bool is_intersection( Hedge arista, DirLine bisec ) {
         return false;
 }
 
-Vertex line_intersection( Hedge arista, DirLine bisec ) {
+Vertex line_intersection( const Hedge* arista, DirLine bisec ) {
     // FIXME
     // Supón que si hay un único punto intersección.
 
-    Vertex v1 = arista.origin;
-    Vertex v2 = arista.twin->origin;
+    Vertex v1 = arista->origin;
+    Vertex v2 = arista->dest;
 
     DirLine line( v1, v2 );
 

@@ -61,16 +61,17 @@ class Hedge: public DirLine {
     void finish_build( Hedge* _twin, Face* _incident_face, Hedge* _next, Hedge* _prev );
 
     Hedge* twin;
-
-  protected:
-    Face*  incident_face;
     Hedge *next, *prev;
+
+    Face* incident_face;
 };
 
 class Face {
   public:
     Face( Vertex );
 
+    void push( Hedge* next_hedge );
+    void pop();
     void finish_build( Hedge* _outer_component );
 
     Vertex get_center();
@@ -101,6 +102,6 @@ DirLine bisector( Vertex v1, Vertex v2 );
 float   determinant( Vertex a, Vertex b );
 bool    is_intersection( Hedge arista, DirLine bisec );
 
-Vertex line_intersection( Hedge arista, DirLine bisec );
+Vertex line_intersection( const Hedge* arista, DirLine bisec );
 
 float dist( Vertex, Vertex );

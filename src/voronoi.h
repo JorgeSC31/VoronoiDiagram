@@ -17,5 +17,8 @@ class voronoi {
     void insert_first_point();
     void add_voronoi( Vertex );
 
-    Face* find_face( Vertex );
+    std::pair< Hedge*, Hedge* > get_face_intersection( const Face*, DirLine );
+
+    Face*  find_face( Vertex );
+    Hedge* cut_face( Face*, Hedge*, Hedge* );
 };
