@@ -227,30 +227,27 @@ float determinant( Vertex a, Vertex b ) {
 }
 
 bool is_intersection( Hedge arista, DirLine bisec ) {
-    // FIXME
-    // Regresa true/false si hay intersección.
-    // La arista tiene origin y dest, pero solo nos interesa
-    // si hay intersección en (origin, dest] con bisec (la recta completa).
+    float A1 = arista.A;
+    float B1 = arista.B;
 
+    float kA = ( abs( A1 ) > tol ? bisec.A / A1 : 0 );
+    float kB = ( abs( B1 ) > tol ? bisec.B / B1 : 0 );
+
+    if ( abs( kA - kB ) > tol && ( kA != 0 && kB != 0 ) )
+        return false;
+
+    Vertex v  = line_intersection( &arista, bisec );
     Vertex v1 = arista.origin;
     Vertex v2 = arista.dest;
 
-    // Checar el caso en el que origin esta sobre la recta
-    if ( bisec.IsLeft( v1 ) == false && bisec.IsRight( v1 ) == false ) {
-        // caso en el que el arista esta completamente sobre la recta
-        if ( bisec.IsLeft( v2 ) == false && bisec.IsRight( v2 ) == false )
-            return true;
-        else
-            return false;
-    }
-
-    if ( bisec.IsLeft( v2 ) == false && bisec.IsRight( v2 ) == false )
-        return true;
-
-    if ( bisec.IsLeft( v1 ) != bisec.IsLeft( v2 ) )
-        return true;
-    else
+    // Si la intersección esta fuera del segmento regresa false
+    if ( v.x < std::min( v1.x, v2.x ) || v.x > std::max( v1.x, v2.x ) ||
+         v.y < std::min( v1.y, v2.y ) || v.y > std::max( v1.y, v2.y ) )
         return false;
+
+    if ( dist( v, v1 ) < tol )
+        return false;
+    return true;
 }
 
 Vertex line_intersection( const Hedge* arista, DirLine bisec ) {
