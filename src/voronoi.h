@@ -11,6 +11,8 @@ class voronoi {
     float                 margin;
     std::vector< Vertex > pts;
 
+    void update_txt( std::ofstream& file );
+
     std::vector< Face* > faces;
 
     void incremental_voronoi();
@@ -20,5 +22,5 @@ class voronoi {
     std::pair< Hedge*, Hedge* > get_face_intersection( const Face*, DirLine );
 
     Face*  find_face( Vertex );
-    Hedge* cut_face( Face*, Hedge*, Hedge* );
+    Hedge* cut_face( Face*, Hedge*, Hedge*, DirLine bisec );
 };

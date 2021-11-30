@@ -48,6 +48,36 @@ Face* voronoi::find_face( Vertex v ) {
     return ret;
 }
 
+Hedge* cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine bisec ) {
+    Vertex v_inter1 = line_intersection( inter1, bisec );
+    Vertex v_inter2 = line_intersection( inter2, bisec );
+
+    Hedge* incident_div = new Hedge( v_inter1, v_inter2 );
+    Hedge* twin         = new Hedge( v_inter2, v_inter1 );
+
+    Hedge* prev = new Hedge( inter1->origin, v_inter1 );
+    Hedge* next = new Hedge( v_inter2, inter2->dest );
+
+    // set prev
+    prev->prev         = inter1->prev;
+    prev->prev->next   = prev;
+    prev->next         = incident_div;
+    incident_div->prev = prev;
+
+    // set next
+    next->prev         = incident_div;
+    incident_div->next = next;
+    next->next         = inter2->next;
+    next->next->prev   = next;
+
+    incident_div->twin = twin;
+    twin->twin         = incident_div;
+
+    inter2->next = nullptr;
+
+    return twin;
+}
+
 void voronoi::add_voronoi( Vertex v ) {
     // Buscar en que cara esta v.
     Face* original_face = find_face( v );
@@ -81,7 +111,7 @@ void voronoi::add_voronoi( Vertex v ) {
             // Además corta el poligono y pone arista.second->next = nullptr.
             // No elimina la cadena de aristas, ya que se va a ocupar después.
             // Las Hedges de caras adyacentes quedan inmutables.
-            Hedge* v_hedge         = cut_face( div_face, aristas.first, aristas.second );
+            Hedge* v_hedge = cut_face( div_face, aristas.first, aristas.second, bisec );
             v_hedge->incident_face = v_face;
             v_face->push( v_hedge );
         }
@@ -115,10 +145,57 @@ void voronoi::add_voronoi( Vertex v ) {
     v_face->close( add_hedge );
 }
 
+void voronoi::insert_first_point() {
+
+    float x_min, x_max, y_min, y_max;
+    x_min = y_min = -std::numeric_limits< float >::max();
+    x_max = y_max = std::numeric_limits< float >::max();
+
+    for ( auto v: pts ) {
+        x_min = std::min( x_min, v.x );
+        x_max = std::max( x_max, v.x );
+        y_min = std::min( y_min, v.y );
+        y_max = std::max( y_max, v.y );
+    }
+    x_min -= margin;
+    y_min -= margin;
+
+    x_max += margin;
+    y_max += margin;
+
+    // Construir la cara con aristas de rectangulo
+    Vertex v1( x_min, y_min );
+    Vertex v2( x_max, y_min );
+    Vertex v3( x_max, y_max );
+    Vertex v4( x_min, y_max );
+
+    Hedge* h1 = new Hedge( v1, v2 );
+    Hedge* h2 = new Hedge( v2, v3 );
+    Hedge* h3 = new Hedge( v3, v4 );
+    Hedge* h4 = new Hedge( v4, v1 );
+
+    h1->prev = h4;
+    h1->next = h2;
+
+    h2->prev = h1;
+    h2->next = h3;
+
+    h3->prev = h2;
+    h3->next = h4;
+
+    h4->prev = h3;
+    h4->next = h1;
+
+    Face* v_face = new Face( pts[0] );
+    v_face->finish_build( h1 );
+}
+
 void voronoi::incremental_voronoi() {
     insert_first_point();
+    // update_txt( std::ofstream& file );
 
     for ( int i = 1; i < pts.size(); i++ ) {
         add_voronoi( pts[i] );
+        // update_txt( std::ofstream& file );
     }
 }
