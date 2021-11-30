@@ -219,7 +219,13 @@ void voronoi::add_voronoi( Vertex v ) {
                 edge_frontier = edge_frontier->next;
                 continue;
             }
+            if ( are_collinear( v_face->get_outer_component()->origin, prev_inter,
+                                edge_frontier->dest ) ) {
+                prev_inter = v_face->get_outer_component()->origin;
+                v_face->pop();
+            }
             Hedge* v_hedge = new Hedge( prev_inter, edge_frontier->dest );
+
             v_face->push( v_hedge );
             prev_inter = edge_frontier->dest;
 

@@ -108,3 +108,4 @@ bool    is_intersection( Hedge arista, DirLine bisec );
 Vertex line_intersection( const Hedge* arista, DirLine bisec );
 
 float dist( Vertex, Vertex );
+bool  are_collinear( Vertex, Vertex, Vertex );

@@ -118,7 +118,12 @@ void Face::push( Hedge* next_hedge ) {
 }
 
 void Face::push( Vertex next_vert ) {
-    Hedge* next_hedge = new Hedge( outer_component->dest, next_vert );
+    Vertex prev = outer_component->dest;
+    if ( are_collinear( outer_component->origin, outer_component->dest, next_vert ) ) {
+        prev = outer_component->origin;
+        pop();
+    }
+    Hedge* next_hedge = new Hedge( prev, next_vert );
     push( next_hedge );
 }
 
@@ -138,7 +143,14 @@ void Face::close( bool add_hedge = false ) {
         first = first->prev;
 
     if ( add_hedge ) {
-        Hedge* n_hedge         = new Hedge( last->dest, first->origin );
+        Vertex prev = last->dest;
+        if ( are_collinear( prev, first->origin, last->origin ) ) {
+            prev = last->origin;
+            pop();
+            last = outer_component;
+        }
+
+        Hedge* n_hedge         = new Hedge( prev, first->origin );
         last->next             = n_hedge;
         n_hedge->prev          = last;
         last                   = n_hedge;
@@ -256,4 +268,10 @@ Vertex line_intersection( const Hedge* arista, DirLine bisec ) {
 float dist( Vertex v1, Vertex v2 ) {
     Vertex v = v1 - v2;
     return v.norm();
+}
+
+bool are_collinear( Vertex v1, Vertex v2, Vertex v3 ) {
+    // FIXME
+    DirLine line( v1, v2 );
+    return ( line.IsLeft( v3 ) == false && line.IsRight( v3 ) == false );
 }
