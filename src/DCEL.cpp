@@ -123,6 +123,23 @@ void Face::pop() {
         outer_component->next = nullptr;
 }
 
+void Face::close( bool add_hedge = false ) {
+    Hedge* last  = outer_component;
+    Hedge* first = outer_component;
+
+    while ( first->prev != nullptr )
+        first = first->prev;
+
+    if ( add_hedge ) {
+        Hedge* n_hedge = new Hedge( last->dest, first->origin );
+        last->next     = n_hedge;
+        n_hedge->prev  = last;
+        last           = n_hedge;
+    }
+    last->next  = first;
+    first->prev = last;
+}
+
 Vertex Face::get_center() {
     return center;
 }

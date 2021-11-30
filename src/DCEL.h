@@ -58,8 +58,7 @@ class DirLine {
 class Hedge: public DirLine {
   public:
     Hedge( Vertex, Vertex );
-    void finish_build( Hedge* _twin, Face* _incident_face, Hedge* _next, Hedge* _prev );
-
+    void   finish_build( Hedge* _twin, Face* _incident_face, Hedge* _next, Hedge* _prev );
     Hedge* twin;
     Hedge *next, *prev;
 
@@ -72,6 +71,8 @@ class Face {
 
     void push( Hedge* next_hedge );
     void pop();
+    void close( bool add_hedge );
+
     void finish_build( Hedge* _outer_component );
 
     Vertex get_center();
