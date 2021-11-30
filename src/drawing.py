@@ -4,12 +4,13 @@ config.frame_width = 14
 
 class Voronoi(Scene):
     def construct(self):
-        file = open("res/case3.out", "r")
+        file = open("../res/case3.out", "r") #Nombre del archivo de salida
 
         num_iterations = int(file.readline())  # Numero de puntos del INPUT
 
         for i in range(1, num_iterations+1):
             # Draw cells points
+            self.add( Text(" Incremental Voronoi  ").shift(3.5*UP).scale(0.5) ) 
             for j in range(i):
                 l = file.readline()
                 s = l.split(" ")
