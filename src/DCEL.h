@@ -1,9 +1,9 @@
 #pragma once
 
+#include <fstream>
 #include <vector>
 #include <string>
 #include <cmath>
-#include <fstream>
 
 // Declarar todas las clases por que se usan mutuamente.
 class Vertex;

@@ -1,8 +1,15 @@
 #include "DCEL.h"
+#include <iostream>
 
 // Tolerancia a zero para punto flotante.
 // const float tol = 0.000001;
-const float tol = 0;
+const float tol = 0.00001;
+
+float abs( float kk ) {
+    if ( kk < 0.0 )
+        kk *= -1.0;
+    return kk;
+}
 
 ////////////////////////
 // Vertex definitions //
@@ -66,7 +73,7 @@ void DirLine::calc_equation() {
 
 bool DirLine::IsLeft( const Vertex& v ) const {
     // Dice si el vertice v esta a la izquierda del segmento dirigido
-    if ( determinant( dest - origin, v - origin ) > tol )
+    if ( determinant( dest - origin, v - origin ) > 0.0 )
         return true;
     else
         return false;
@@ -74,7 +81,7 @@ bool DirLine::IsLeft( const Vertex& v ) const {
 
 bool DirLine::IsRight( const Vertex& v ) const {
     // Dice si el vertice v esta a la izquierda del segmento dirigido
-    if ( determinant( dest - origin, v - origin ) < tol )
+    if ( determinant( dest - origin, v - origin ) < 0.0 )
         return true;
     else
         return false;
@@ -230,19 +237,26 @@ bool is_intersection( Hedge arista, DirLine bisec ) {
     float A1 = arista.A;
     float B1 = arista.B;
 
-    float kA = ( abs( A1 ) > tol ? bisec.A / A1 : 0 );
-    float kB = ( abs( B1 ) > tol ? bisec.B / B1 : 0 );
+    float kA = ( abs( A1 ) > tol ? bisec.A / A1 : 0.0 );
+    float kB = ( abs( B1 ) > tol ? bisec.B / B1 : 0.0 );
 
-    if ( abs( kA - kB ) > tol && ( kA != 0 && kB != 0 ) )
+    Vertex vk( kA * A1, kB * B1 );
+    Vertex vbis( bisec.A, bisec.B );
+    if ( abs( kA - kB ) < tol && dist( vk, vbis ) < tol )
         return false;
 
-    Vertex v  = line_intersection( &arista, bisec );
-    Vertex v1 = arista.origin;
-    Vertex v2 = arista.dest;
+    Vertex v     = line_intersection( &arista, bisec );
+    Vertex v1    = arista.origin;
+    Vertex v2    = arista.dest;
+    float  x     = v.x;
+    float  y     = v.y;
+    float  x_min = std::min( v1.x, v2.x );
+    float  x_max = std::max( v1.x, v2.x );
+    float  y_min = std::min( v1.y, v2.y );
+    float  y_max = std::max( v1.y, v2.y );
 
     // Si la intersección esta fuera del segmento regresa false
-    if ( v.x < std::min( v1.x, v2.x ) || v.x > std::max( v1.x, v2.x ) ||
-         v.y < std::min( v1.y, v2.y ) || v.y > std::max( v1.y, v2.y ) )
+    if ( x_min - x > tol || x - x_max > tol || y_min - y > tol || y - y_max > tol )
         return false;
 
     if ( dist( v, v1 ) < tol )

@@ -4,8 +4,8 @@
 
 class voronoi {
   public:
-    voronoi( std::vector< std::pair< float, float > > _pts, float _margin = 0.5 );
-    voronoi( std::string file_name, float _margin = 0.5 );
+    voronoi( std::vector< std::pair< float, float > > _pts, float _margin = 1.0 );
+    voronoi( std::string file_name, float _margin = 1.0 );
 
   protected:
     float                 margin;
