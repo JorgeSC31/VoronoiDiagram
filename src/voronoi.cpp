@@ -115,7 +115,7 @@ Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine 
     prev->incident_face = div_face;
 
     // Prueba
-    prev->twin = inter1->twin;
+    // prev->twin = inter1->twin;
     // inter1->twin = prev;
 
     // set next
@@ -129,7 +129,7 @@ Hedge* voronoi::cut_face( Face* div_face, Hedge* inter1, Hedge* inter2, DirLine 
         next->next->prev    = next;
         next->incident_face = div_face;
         // Prueba
-        next->twin = inter2->twin;
+        // next->twin = inter2->twin;
         // inter2->twin = next;
     }
     incident_div->incident_face = div_face;
@@ -250,7 +250,7 @@ void voronoi::add_voronoi( Vertex v ) {
 
     } while ( div_face != original_face );
     v_face->close( add_prev );
-    // fix_twins( v_face );
+    fix_twins( v_face );
 }
 
 void voronoi::insert_first_point() {
