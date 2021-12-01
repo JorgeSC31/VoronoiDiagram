@@ -18,4 +18,9 @@ manim -pql drawing.py Voronoi
 
 El programa [drawing.py](src/drawing.py) realiza la animación leyendo el archivo de texto de salida generado anteriormente. 
 
-Para probar el algoritmo se agregó también el archivo [gen_cases.py](src/gen_cases.py) para generar archivos de entrada con puntos aleatorios de distribución uniforme.
+Se probó el algoritmo con tres casos:
+- Caso 1: Con [gen_ran_points.py](src/gen_ran_points.py) se generaron 100 números aleatorios que se imprimen en [case1.in](res/case1.in).
+- Caso 2: Con [gen_grid.py](src/grid_generator.py) se generó una cuadrícula de 20 puntos que se imprimen en [case2.in](res/case2.in).
+- Caso 3: Con [gen_circle_points.py](src/gen_circle_points.py) se generaron 10 números sobre una circunferencia y se agregá el punto central de la circunferencia. Los puntos se imprimen en [case3.in](res/case3.in).
+
+Luego, se generaron los archivos de salida del algoritmo y se animaron obteniendo los videos que se encuentran [aquí](src/media/videos).
