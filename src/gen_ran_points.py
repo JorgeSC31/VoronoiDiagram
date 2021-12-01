@@ -1,7 +1,7 @@
 import numpy as np
 
 # Variables para generar el caso
-file = open("res/case3.in", "w")
+file = open("res/case1.in", "w")
 N = 100
 x_lim = 9/2
 y_lim = x_lim/1.7
