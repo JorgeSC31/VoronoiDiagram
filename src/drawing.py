@@ -43,7 +43,7 @@ class Voronoi(Scene):
                 x2 = float(s[2])
                 y2 = float(s[3])
 
-            self.wait(0.4)  # Wait 1 second
+            self.wait(0.5)  # Wait half second
             self.clear()  # Erase
 
         file.close()
